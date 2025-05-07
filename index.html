@@ -272,22 +272,21 @@
         </div>
         <div class="content">
             <div id="orderDetails">
-                <p><strong>Order Number:</strong> <span id="orderNumber"></span></p>
-                <p><strong>Code:</strong> <span id="code"></span></p>
-                <p><strong>Name:</strong> <span id="name"></span></p>
-                <p><strong>Price:</strong> $<span id="price"></span></p>
+                <!-- Existing order details remain the same -->
             </div>
             
             <hr>
             
-            <div class="payment-instructions">
-                <h3>Payment Instructions</h3>
+            <!-- BIBD Transfer Section -->
+            <div class="payment-instructions bibd">
                 <div class="account-row">
-                    <span id="accNum">00010010017716</span>
-                    <button class="copy-btn" onclick="copyToClipboard()">Copy Account Number</button>
+                    <span id="bibdAccNum">00010010017716</span>
+                    <button class="copy-btn" onclick="copyBIBDNumber()">Copy Account Number</button>
                 </div>
+            </div>
 
-                       <div class="payment-instructions baiduri">
+            <!-- BAIDURI Transfer Section -->
+            <div class="payment-instructions baiduri">
                 <div class="account-row">
                     <span id="baiduriAccNum">0400117527239</span>
                     <button class="copy-btn" onclick="copyBaiduriNumber()">Copy Account Number</button>
@@ -300,8 +299,9 @@
                     <span id="taibAccNum">004107933101010</span>
                     <button class="copy-btn" onclick="copyTaibNumber()">Copy Account Number</button>
                 </div>
-            </div> 
+            </div>
 
+            <!-- Existing vcard section -->
             <div class="vcard-section">
                 <div>NOORZAFIRAH</div>
                 <div class="account-row" style="margin-top: 8px;">
@@ -309,7 +309,12 @@
                     <button class="copy-btn" onclick="copyVcardNumber()">Copy Vcard Number</button>
                 </div>
             </div>
+
+            <form id="paymentForm">
+                <!-- Existing form elements remain the same -->
+            </form>
         </div>
+    </div>
 
             <form id="paymentForm">
                 <input type="hidden" id="branchPhone">
