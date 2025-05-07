@@ -26,7 +26,6 @@
         line-height: 1.7;
     }
 
-    /* Loading Spinner */
     #loader {
         display: flex;
         justify-content: center;
@@ -54,7 +53,6 @@
         100% { transform: rotate(360deg); }
     }
 
-    /* Containers */
     .container {
         width: 100%;
         max-width: 600px;
@@ -69,7 +67,6 @@
         opacity: 1;
     }
 
-    /* Header */
     .header {
         background: var(--primary-color);
         padding: 15px;
@@ -92,12 +89,10 @@
         font-weight: 700;
     }
 
-    /* Content */
     .content {
         padding: 25px 20px;
     }
 
-    /* Error Container */
     #errorContainer {
         display: none;
         color: var(--error);
@@ -105,7 +100,6 @@
         text-align: center;
     }
 
-    /* Order Details */
     #orderDetails p {
         margin-bottom: 8px;
     }
@@ -116,7 +110,6 @@
         border-top: 1px solid #eee;
     }
 
-    /* Payment Instructions */
     .payment-instructions {
         margin-top: 5px;
     }
@@ -132,6 +125,14 @@
         text-transform: uppercase;
     }
 
+    .payment-instructions.baiduri::before {
+        content: "BAIDURI TRANSFER";
+    }
+
+    .payment-instructions.taib::before {
+        content: "TAIB TRANSFER";
+    }
+
     .account-row {
         display: flex;
         flex-direction: column;
@@ -139,25 +140,17 @@
         margin: 20px 0;
     }
 
-    #accNum {
+    .account-box {
         padding: 12px;
-        background: #FFFBE6;
+        background: var(--white);
         border: 1px solid var(--primary-color);
         border-radius: 4px;
         word-break: break-word;
         text-align: center;
+        margin: 5px 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
-        #vcardNum {
-        padding: 12px;
-        background: #FFFBE6;
-        border: 1px solid var(--primary-color);
-        border-radius: 4px;
-        word-break: break-word;
-        text-align: center;
-    }
-
-    /* Form Elements */
     .copy-btn, input[type="submit"] {
         background: var(--primary-color);
         color: white;
@@ -183,9 +176,19 @@
         border-radius: 4px;
     }
 
-    /* Confirmation Content */
     #confirmationContent p {
         margin-bottom: 16px;
+    }
+
+    .vcard-section {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+    }
+
+    .vcard-section > div:first-child {
+        font-weight: 500;
+        margin-bottom: 4px;
     }
 
     @media (min-width: 768px) {
@@ -217,42 +220,11 @@
             min-width: 140px;
         }
 
-        #accNum {
+        .account-box {
             text-align: left;
-        }
-
-        #vcardNum {
-            text-align: left;
-        }
-
-        .payment-instructions::before {
-            font-size: 20px;
+            flex-grow: 1;
         }
     }
-
-        .vcard-section {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid #eee;
-}
-
-.vcard-section > div:first-child {
-    font-weight: 500;
-    margin-bottom: 4px;
-}
-
-        .payment-instructions.bibd::before {
-            content: "BIBD TRANSFER";
-        }
-
-        .payment-instructions.baiduri::before {
-            content: "BAIDURI TRANSFER";
-        }
-
-        .payment-instructions.taib::before {
-            content: "TAIB TRANSFER";
-        }
-    
 </style>
 </head>
 <body>
@@ -284,15 +256,15 @@
             <!-- BIBD Transfer Section -->
             <div class="payment-instructions bibd">
                 <div class="account-row" style="margin-top: 8px;">
-                    <span id="bibdAccNum">00010010017716</span>
+                    <span id="bibdAccNum" class="account-box">00010010017716</span>
                     <button class="copy-btn" onclick="copyBIBDNumber()">Copy Account Number</button>
                 </div>
             </div>
 
             <!-- BAIDURI Transfer Section -->
             <div class="payment-instructions baiduri">
-                <div class="account-row" style="margin-top: 8px;">
-                    <span id="baiduriAccNum">0400117527239</span>
+                <div class="account-row">
+                    <span id="baiduriAccNum" class="account-box">0400117527239</span>
                     <button class="copy-btn" onclick="copyBaiduriNumber()">Copy Account Number</button>
                 </div>
             </div>
@@ -300,7 +272,7 @@
             <!-- TAIB Transfer Section -->
             <div class="payment-instructions taib">
                 <div class="account-row" style="margin-top: 8px;">
-                    <span id="taibAccNum">004107933101010</span>
+                    <span id="taibAccNum" class="account-box">004107933101010</span>
                     <button class="copy-btn" onclick="copyTaibNumber()">Copy Account Number</button>
                 </div>
             </div>
@@ -309,7 +281,7 @@
             <div class="vcard-section">
                 <div>NOORZAFIRAH</div>
                 <div class="account-row" style="margin-top: 8px;">
-                    <span id="vcardNum">7181777</span>
+                    <span id="vcardNum" class="account-box">7181777</span>
                     <button class="copy-btn" onclick="copyVcardNumber()">Copy Vcard Number</button>
                 </div>
             </div>
