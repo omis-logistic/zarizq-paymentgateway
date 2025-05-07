@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZARIZQ Payment Gateway</title>
+    <title>ZA RIZQ Payment Gateway</title>
 <style>
     :root {
         --primary-color: #FF964F;  /* Pastel orange */
@@ -240,6 +240,18 @@
     font-weight: 500;
     margin-bottom: 4px;
 }
+
+        .payment-instructions.bibd::before {
+            content: "BIBD TRANSFER";
+        }
+
+        .payment-instructions.baiduri::before {
+            content: "BAIDURI TRANSFER";
+        }
+
+        .payment-instructions.taib::before {
+            content: "TAIB TRANSFER";
+        }
     
 </style>
 </head>
@@ -255,7 +267,7 @@
     <!-- Main Form -->
     <div id="mainContainer" class="container">
         <div class="header">
-            <h1>ZARIZQ ENTERPRISE</h1>
+            <h1>ZA RIZQ ENTERPRISE</h1>
             <h2>Payment Gateway</h2>
         </div>
         <div class="content">
@@ -274,7 +286,22 @@
                     <span id="accNum">00010010017716</span>
                     <button class="copy-btn" onclick="copyToClipboard()">Copy Account Number</button>
                 </div>
-                <!-- Added Vcard Section -->
+
+                       <div class="payment-instructions baiduri">
+                <div class="account-row">
+                    <span id="baiduriAccNum">0400117527239</span>
+                    <button class="copy-btn" onclick="copyBaiduriNumber()">Copy Account Number</button>
+                </div>
+            </div>
+
+            <!-- TAIB Transfer Section -->
+            <div class="payment-instructions taib">
+                <div class="account-row">
+                    <span id="taibAccNum">004107933101010</span>
+                    <button class="copy-btn" onclick="copyTaibNumber()">Copy Account Number</button>
+                </div>
+            </div> 
+
             <div class="vcard-section">
                 <div>NOORZAFIRAH</div>
                 <div class="account-row" style="margin-top: 8px;">
@@ -311,187 +338,187 @@
         <div class="content" id="confirmationContent"></div>
     </div>
 
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbya1NV4uMJ5hwu0CPznpOOUMU7ev1hEeQXr_vUkdyklIZoUo3W4fV-fMtMGE7Dl8sYV/exec";
-        let currentOrder = null;
-        let timeoutId;
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbya1NV4uMJ5hwu0CPznpOOUMU7ev1hEeQXr_vUkdyklIZoUo3W4fV-fMtMGE7Dl8sYV/exec";
+    let currentOrder = null;
+    let timeoutId;
 
-        // 1. Clipboard Function
-        function copyToClipboard() {
-            const accNum = document.getElementById('accNum');
-            const tempInput = document.createElement('input');
-            tempInput.value = accNum.textContent;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            
-            try {
-                document.execCommand('copy');
-                alert('Account number copied to clipboard!');
-            } catch (err) {
-                alert('Failed to copy! Please manually select the text.');
-            }
-            document.body.removeChild(tempInput);
+    // Copy Functions
+    function copyToClipboard(elementId, description = 'account number') {
+        const element = document.getElementById(elementId);
+        const tempInput = document.createElement('input');
+        tempInput.value = element.textContent;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        
+        try {
+            document.execCommand('copy');
+            alert(`${description} copied to clipboard!`);
+        } catch (err) {
+            alert(`Failed to copy! Please manually select the ${description}.`);
+        }
+        document.body.removeChild(tempInput);
+    }
+
+    function copyBIBDNumber() {
+        copyToClipboard('bibdAccNum', 'BIBD account number');
+    }
+
+    function copyBaiduriNumber() {
+        copyToClipboard('baiduriAccNum', 'BAIDURI account number');
+    }
+
+    function copyTaibNumber() {
+        copyToClipboard('taibAccNum', 'TAIB account number');
+    }
+
+    function copyVcardNumber() {
+        copyToClipboard('vcardNum', 'Vcard number');
+    }
+
+    // Order Data Handler
+    function handleOrderData(response) {
+        console.log('Server Response:', response);
+        clearTimeout(timeoutId);
+        const loader = document.getElementById('loader');
+        
+        if (response.error) {
+            showError(response.error);
+            return;
         }
 
-        function copyVcardNumber() {
-            const vcardNum = document.getElementById('vcardNum');
-            const tempInput = document.createElement('input');
-            tempInput.value = vcardNum.textContent;
-            document.body.appendChild(tempInput);
-            tempInput.select();
+        try {
+            currentOrder = response;
+            document.getElementById('orderNumber').textContent = response.orderNumber;
+            document.getElementById('code').textContent = response.code || 'N/A';
+            document.getElementById('name').textContent = response.name || 'N/A';
+            document.getElementById('price').textContent = response.price || '0.00';
+            document.getElementById('branchPhone').value = response.branchPhone || '6737187776';
             
-            try {
-                document.execCommand('copy');
-                alert('Vcard number copied to clipboard!');
-            } catch (err) {
-                alert('Failed to copy! Please manually select the text.');
-            }
-            document.body.removeChild(tempInput);
+            loader.style.display = 'none';
+            document.getElementById('mainContainer').classList.add('visible');
+        } catch (error) {
+            showError('Failed to display order details');
+        }
+    }
+
+    // Payment Handler
+    async function handlePaymentSubmit(e) {
+        e.preventDefault();
+        const fileInput = document.getElementById('paymentForm').uploadFile;
+        
+        if (!fileInput.files.length) {
+            alert('Please select a payment screenshot');
+            return;
         }
 
-        // 2. Order Data Handler
-        function handleOrderData(response) {
-            console.log('Server Response:', response);
-            clearTimeout(timeoutId);
-            const loader = document.getElementById('loader');
+        // Show processing screen
+        document.getElementById('mainContainer').classList.remove('visible');
+        document.getElementById('processingContainer').classList.add('visible');
+
+        try {
+            const file = fileInput.files[0];
+            const fileData = await readFile(file);
             
-            if (response.error) {
-                showError(response.error);
-                return;
-            }
-
-            try {
-                currentOrder = response;
-                document.getElementById('orderNumber').textContent = response.orderNumber;
-                document.getElementById('code').textContent = response.code || 'N/A';
-                document.getElementById('name').textContent = response.name || 'N/A';
-                document.getElementById('price').textContent = response.price || '0.00';
-                document.getElementById('branchPhone').value = response.branchPhone || '6737187776';
-                
-                loader.style.display = 'none';
-                document.getElementById('mainContainer').classList.add('visible');
-            } catch (error) {
-                showError('Failed to display order details');
-            }
-        }
-
-        // 3. Payment Handler
-        async function handlePaymentSubmit(e) {
-            e.preventDefault();
-            const fileInput = document.getElementById('paymentForm').uploadFile;
-            
-            if (!fileInput.files.length) {
-                alert('Please select a payment screenshot');
-                return;
-            }
-
-            // Show processing screen
-            document.getElementById('mainContainer').classList.remove('visible');
-            document.getElementById('processingContainer').classList.add('visible');
-
-            try {
-                const file = fileInput.files[0];
-                const fileData = await readFile(file);
-                
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        ...currentOrder,
-                        upload: {
-                            name: file.name,
-                            data: fileData.split(',')[1],
-                            contentType: file.type
-                        }
-                    })
-                });
-
-                const result = await response.json();
-                if (!result.success) throw new Error(result.error);
-
-                showConfirmation(result);
-            } catch (error) {
-                document.getElementById('mainContainer').classList.add('visible');
-                document.getElementById('processingContainer').classList.remove('visible');
-                alert(`Payment Failed: ${error.message}`);
-            }
-        }
-
-        // 4. Helper Functions
-        function readFile(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    ...currentOrder,
+                    upload: {
+                        name: file.name,
+                        data: fileData.split(',')[1],
+                        contentType: file.type
+                    }
+                })
             });
-        }
 
-        function showConfirmation(data) {
-            const message = `Payment Confirmation
+            const result = await response.json();
+            if (!result.success) throw new Error(result.error);
+
+            showConfirmation(result);
+        } catch (error) {
+            document.getElementById('mainContainer').classList.add('visible');
+            document.getElementById('processingContainer').classList.remove('visible');
+            alert(`Payment Failed: ${error.message}`);
+        }
+    }
+
+    // Helper Functions
+    function readFile(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function showConfirmation(data) {
+        const message = `Payment Confirmation
 Order Number: ${data.orderNumber}
 Code: ${data.code}
 Name: ${data.name}
 Price: $${data.price}
 Receipt: ${data.url}`;
 
-            document.getElementById('processingContainer').classList.remove('visible');
-            document.getElementById('confirmationContent').innerHTML = `
-                <p><strong>Order Number:</strong> ${data.orderNumber}</p>
-                <p><strong>Code:</strong> ${data.code}</p>
-                <p><strong>Name:</strong> ${data.name}</p>
-                <p><strong>Price:</strong> $${data.price}</p>
-                <p><strong>Receipt:</strong> <a href="${data.url}" target="_blank">View</a></p>
-                <button class="copy-btn" 
-                    onclick="window.open('https://wa.me/${data.branchPhone}?text=${encodeURIComponent(message)}')">
-                    Send via WhatsApp
-                </button>
-            `;
-            document.getElementById('confirmationContainer').classList.add('visible');
+        document.getElementById('processingContainer').classList.remove('visible');
+        document.getElementById('confirmationContent').innerHTML = `
+            <p><strong>Order Number:</strong> ${data.orderNumber}</p>
+            <p><strong>Code:</strong> ${data.code}</p>
+            <p><strong>Name:</strong> ${data.name}</p>
+            <p><strong>Price:</strong> $${data.price}</p>
+            <p><strong>Receipt:</strong> <a href="${data.url}" target="_blank">View</a></p>
+            <button class="copy-btn" 
+                onclick="window.open('https://wa.me/${data.branchPhone}?text=${encodeURIComponent(message)}')">
+                Send via WhatsApp
+            </button>
+        `;
+        document.getElementById('confirmationContainer').classList.add('visible');
+    }
+
+    function showError(message) {
+        clearTimeout(timeoutId);
+        const loader = document.getElementById('loader');
+        const errorContainer = document.getElementById('errorContainer');
+        
+        loader.style.display = 'none';
+        errorContainer.innerHTML = `
+            <h2>⚠️ Error</h2>
+            <p>${message}</p>
+            <p>Please contact support with your order number</p>
+        `;
+        errorContainer.classList.add('visible');
+    }
+
+    // Initialization
+    document.addEventListener('DOMContentLoaded', () => {
+        // Show loader immediately
+        document.getElementById('loader').style.display = 'flex';
+        
+        // Get order number from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        let orderNumber = urlParams.get('orderNumber') || '';
+        orderNumber = orderNumber.toUpperCase().trim();
+
+        if (!orderNumber) {
+            showError('Order number is required in URL');
+            return;
         }
 
-        function showError(message) {
-            clearTimeout(timeoutId);
-            const loader = document.getElementById('loader');
-            const errorContainer = document.getElementById('errorContainer');
-            
-            loader.style.display = 'none';
-            errorContainer.innerHTML = `
-                <h2>⚠️ Error</h2>
-                <p>${message}</p>
-                <p>Please contact support with your order number</p>
-            `;
-            errorContainer.classList.add('visible');
-        }
+        // Setup form submission
+        document.getElementById('paymentForm').addEventListener('submit', handlePaymentSubmit);
 
-        // 5. Initialization
-        document.addEventListener('DOMContentLoaded', () => {
-            // Show loader immediately
-            document.getElementById('loader').style.display = 'flex';
-            
-            // Get order number from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            let orderNumber = urlParams.get('orderNumber') || '';
-            orderNumber = orderNumber.toUpperCase().trim();
+        // Load order data
+        const script = document.createElement('script');
+        script.src = `${SCRIPT_URL}?orderNumber=${encodeURIComponent(orderNumber)}&callback=handleOrderData`;
+        script.onerror = () => showError('Failed to connect to server');
+        document.head.appendChild(script);
 
-            if (!orderNumber) {
-                showError('Order number is required in URL');
-                return;
-            }
-
-            // Setup form submission
-            document.getElementById('paymentForm').addEventListener('submit', handlePaymentSubmit);
-
-            // Load order data
-            const script = document.createElement('script');
-            script.src = `${SCRIPT_URL}?orderNumber=${encodeURIComponent(orderNumber)}&callback=handleOrderData`;
-            script.onerror = () => showError('Failed to connect to server');
-            document.head.appendChild(script);
-
-            // Set 30-second timeout
-            timeoutId = setTimeout(() => {
-                showError('Server is taking longer than expected. Please try again.');
-            }, 30000);
-        });
-    </script>
+        // Set 30-second timeout
+        timeoutId = setTimeout(() => {
+            showError('Server is taking longer than expected. Please try again.');
+        }, 30000);
+    });
+</script>
 </body>
 </html>
